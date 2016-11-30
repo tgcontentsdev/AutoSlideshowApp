@@ -63,6 +63,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CODE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getContentsInfo();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+
     private void getContentsInfo() {
 
         // 画像の情報を取得する
@@ -93,15 +107,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setImage() {
-        Uri imageUri = uriArrayList.get(0);
-        imageView.setImageURI(imageUri);
+        Uri imageUri;
+        if (uriArrayList.size() != 0) {
+            imageUri = uriArrayList.get(0);
+            imageView.setImageURI(imageUri);
+        }
     }
 
     @Override
     public void onClick(View v) {
         Uri imageUri;
 
-        if (v.getId() == R.id.backButton) {
+        if (v.getId() == R.id.backButton && uriArrayList.size() != 0) {
             if (i == 0) {
                 imageUri = uriArrayList.get(uriArrayList.size() - 1);
                 i = uriArrayList.size() - 1;
@@ -110,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 i --;
             }
             imageView.setImageURI(imageUri);
-        } else if (v.getId() == R.id.nextbutton) {
+        } else if (v.getId() == R.id.nextbutton && uriArrayList.size() != 0) {
             nextAction();
         } else if (v.getId() == R.id.startButton) {
             if (flag) {
@@ -125,7 +142,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                nextAction();
+                                if (uriArrayList.size() != 0) {
+                                    nextAction();
+                                }
                             }
                         });
 
@@ -136,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startButton.setText("▶︎");
                 backButton.setEnabled(true);
                 nextButton.setEnabled(true);
+                flag = true;
                 if (timer != null){
                     timer.cancel();
                     timer = null;
